@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 # ------------------------------------------------------------------------------
 # Set download path etc...
 downLoadPath  = '/your/download/directory'

@@ -6,9 +6,12 @@
 * chromium
 ### Bedienung
 * Im Script oben Download-Pfad und Zugangsnummer eintragen
-* Im Terminal starten mit:  
+* Terminal starten mit:
 
-      python3 -i cddl.py  
+      > ./cddl.py
+* Alternativ für den interaktiven Modus (s.u.), Terminal starten mit:
+
+      > ./cddl.py -i
 
 * Im Python-Terminal (nicht im Browser) die PIN eingeben  
 (Die PIN wird während der Eingabe nicht angezeigt, um ein Auto-cachen auf dem Rechner zu verhindern)
@@ -22,6 +25,7 @@ Wer sein gesamtes Archiv herunterladen möchte, kann auch im Script oben
 
 setzen.
 
+### Interaktiver Modus
 Nach Beendigung wird die Python-Shell nicht geschlossen. Man kann beliebig in der Postbox suchen und dann die letzte Script-Zeile
  
     cddlGetPdf(drv)

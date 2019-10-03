@@ -15,6 +15,7 @@
 
 * Im Python-Terminal (nicht im Browser) die PIN eingeben  
 (Die PIN wird während der Eingabe nicht angezeigt, um ein Auto-cachen auf dem Rechner zu verhindern)
+* Alternativ: Option `-l` mitgeben und nach Öffnen des Browsers dort selbständig einloggen.
 * Im Browser dann Photo-TAN eingeben
 
 Heruntergeladen werden alle PDFs im Posteingang mit Ausnahme der Links, die "Termingebundenes" enthalten, weil hier die Comdirect trotz .pdf-Endung manchmal einen HTML-Link versteckt und das Script dann durcheinanderkäme.
@@ -23,7 +24,7 @@ Wer sein gesamtes Archiv herunterladen möchte, kann auch im Script oben
 
     gotoArchive = True
 
-setzen.
+setzen, oder die Option `-a` mitgeben.
 
 ### Interaktiver Modus
 Nach Beendigung wird die Python-Shell nicht geschlossen. Man kann beliebig in der Postbox suchen und dann die letzte Script-Zeile

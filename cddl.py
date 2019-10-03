@@ -8,6 +8,7 @@ gotoArchive   = False
 # ------------------------------------------------------------------------------
 # Misc imports
 import os, sys
+import atexit
 from time import sleep
 from getpass import getpass
 from selenium import webdriver
@@ -26,6 +27,10 @@ def cddlDriver():
         }
     )
     return webdriver.Chrome('/usr/bin/chromedriver', chrome_options = chromeOptions)
+
+# Graceful shutdown
+def cddlClose(driver):
+    driver.quit()
 
 # Login and goto postbox
 def cddlLogin(driver):
@@ -166,6 +171,9 @@ if __name__ == "__main__":
         os.environ["PYTHONINSPECT"] = 'x'
 
     drv = cddlDriver()
+
+    # quit driver on exit
+    atexit.register(cddlClose, drv)
 
     cddlLogin(drv)
     cddlGetPdf(drv)

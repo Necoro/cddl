@@ -156,6 +156,12 @@ def cddlGetPdf(driver):
                 print('Skipped    -> {:5d} documents'.format(cntHtml))
                 print('No more right button -> End of download')
                 print('----------------------------------------------')
+                if os.environ.get('PYTHONINSPECT'):
+                    print()
+                    print('You are now in interactive mode!')
+                    print('-> You can navigate the browser at your will.')
+                    print('-> Enter >cddlGetPdf(drv)< to download the pdfs from the current view.')
+                    print('-> Enter >exit()< or press Ctrl-D to exit.')
                 break;
             driver.execute_script("arguments[0].click();", rightbutton)
 

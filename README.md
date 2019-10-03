@@ -6,10 +6,10 @@
 * chromium
 ### Bedienung
 * Im Script oben Download-Pfad und Zugangsnummer eintragen
-* Terminal starten mit:
+* Im Terminal starten mit:
 
       > ./cddl.py
-* Alternativ für den interaktiven Modus (s.u.), Terminal starten mit:
+* Alternativ für den interaktiven Modus (s.u.), im Terminal starten mit:
 
       > ./cddl.py -i
 

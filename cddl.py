@@ -7,6 +7,7 @@ gotoArchive   = False
 
 # ------------------------------------------------------------------------------
 # Misc imports
+import os, sys
 from time import sleep
 from getpass import getpass
 from selenium import webdriver
@@ -14,10 +15,8 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.chrome.options import Options
 
 # ------------------------------------------------------------------------------
-# Login and goto postbox
-def cddlLogin():
-
-    # Prepare and open the chrome driver
+# Prepare and open the chrome driver
+def cddlDriver():
     chromeOptions = Options()
     chromeOptions.add_experimental_option('prefs',  {
         "download.default_directory":         downLoadPath,
@@ -26,7 +25,10 @@ def cddlLogin():
         "plugins.always_open_pdf_externally": True
         }
     )
-    driver        = webdriver.Chrome('/usr/bin/chromedriver', chrome_options = chromeOptions)
+    return webdriver.Chrome('/usr/bin/chromedriver', chrome_options = chromeOptions)
+
+# Login and goto postbox
+def cddlLogin(driver):
     comdirectUrl  = 'https://kunde.comdirect.de/lp/wt/login?execution=e1s1&afterTimeout=true'
     postBoxUrl    = 'https://kunde.comdirect.de/itx/posteingangsuche'
     driver.get(comdirectUrl);
@@ -158,7 +160,14 @@ def cddlGetPdf(driver):
 
 # ------------------------------------------------------------------------------
 # Login and download
-drv = cddlLogin()
-cddlGetPdf(drv)
+if __name__ == "__main__":
+    if len(sys.argv) > 1 and sys.argv[1] == "-i":
+        # force interactive mode
+        os.environ["PYTHONINSPECT"] = 'x'
+
+    drv = cddlDriver()
+
+    cddlLogin(drv)
+    cddlGetPdf(drv)
 
 # ------------------------------------------------------------------------------

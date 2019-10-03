@@ -2,17 +2,23 @@
 # ------------------------------------------------------------------------------
 # Set download path etc...
 downLoadPath  = '/your/download/directory'
-zugangsNummer = '012345678'
-gotoArchive   = False
+zugangsNummer = '012345678' # see also -l option
+gotoArchive   = False # see also -a option
+maxTimeout = 500 # max timeout in s
 
 # ------------------------------------------------------------------------------
 # Misc imports
 import os, sys
 import atexit
+from optparse import OptionParser
 from time import sleep
 from getpass import getpass
 from selenium import webdriver
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 
 # ------------------------------------------------------------------------------
@@ -32,8 +38,16 @@ def cddlDriver():
 def cddlClose(driver):
     driver.quit()
 
+# Busy waiting for element
+def waitFor(driver, condition, descr):
+    try:
+        return WebDriverWait(driver, maxTimeout).until(condition)
+    except TimeoutException:
+        print('Encountered Timeout during waiting for {}. Perhaps increase the timeout (current value: {:d}).'.format(descr, maxTimeout))
+        sys.exit(2)
+
 # Login and goto postbox
-def cddlLogin(driver):
+def cddlLogin(driver, loginDirectly=False, gotoArchive=False):
     comdirectUrl  = 'https://kunde.comdirect.de/lp/wt/login?execution=e1s1&afterTimeout=true'
     postBoxUrl    = 'https://kunde.comdirect.de/itx/posteingangsuche'
     driver.get(comdirectUrl);
@@ -45,23 +59,17 @@ def cddlLogin(driver):
 
     # Login
     zugangsNummerField.send_keys(zugangsNummer)
-    pinField.send_keys(getpass('PIN: '))
-    loginButton.click()
-    sleep(1)
+    if not loginDirectly:
+        pinField.send_keys(getpass('PIN: '))
+        loginButton.click()
+        sleep(1)
+    else:
+        # Necoro: one could use url_contains here, but this is not supported by my version of selenium
+        waitFor(driver, EC.presence_of_element_located((By.PARTIAL_LINK_TEXT, 'PostBox')), 'login')
 
     # Goto postbox
-    driver.get(postBoxUrl);
-
-    # Wait for postbox
-    cnt = 0
-    while True:
-        try:
-            driver.find_element_by_link_text('Archiv')
-            break
-        except:
-            cnt = cnt + 1
-            print('Wait for postbox {:3d} sec'.format(cnt))
-            sleep(1)
+    driver.get(postBoxUrl)
+    waitFor(driver, EC.presence_of_element_located((By.LINK_TEXT, 'Archiv')), 'postbox')
 
     # Enable this if you want to go to the archive
     if gotoArchive:
@@ -170,18 +178,25 @@ def cddlGetPdf(driver):
             break
 
 # ------------------------------------------------------------------------------
+def enable_inspect():
+    # force interactive mode
+    os.environ["PYTHONINSPECT"] = 'x'
+
 # Login and download
 if __name__ == "__main__":
-    if len(sys.argv) > 1 and sys.argv[1] == "-i":
-        # force interactive mode
-        os.environ["PYTHONINSPECT"] = 'x'
+    opt = OptionParser()
+    opt.add_option('-i', action="callback", callback=enable_inspect, help="Enable interactive mode")
+    opt.add_option('-l', action="store_true", dest="login", help="Login directly in browser")
+    opt.add_option('-a', action="store_true", dest="archive", help="Goto archive instead of main postbox")
+
+    options, _ = opt.parse_args()
 
     drv = cddlDriver()
 
     # quit driver on exit
     atexit.register(cddlClose, drv)
 
-    cddlLogin(drv)
+    cddlLogin(drv, options.login, options.archive or gotoArchive)
     cddlGetPdf(drv)
 
 # ------------------------------------------------------------------------------
